@@ -1,6 +1,6 @@
 resource "azurerm_resource_group" "iothub" {
   name     = "${var.azure_prefix}iothubresources"
-  location = "West Europe"
+  location = var.azure_location
 }
 
 resource "azurerm_storage_account" "iothub" {
