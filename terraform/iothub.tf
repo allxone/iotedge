@@ -9,12 +9,15 @@ resource "azurerm_storage_account" "iothub" {
   location                 = azurerm_resource_group.iothub.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  account_kind             = "StorageV2"
+  is_hns_enabled           = "true"   # hns can't be used as a target for diagnostic settings
 }
 
 resource "azurerm_storage_container" "messagecontainer" {
   name                  = "${var.azure_prefix}messagecontainer"
   storage_account_name  = azurerm_storage_account.iothub.name
   container_access_type = "private"
+
 }
 
 resource "azurerm_storage_container" "filecontainer" {

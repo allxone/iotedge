@@ -6,10 +6,18 @@ resource "azurerm_log_analytics_workspace" "iothub" {
   retention_in_days   = 7
 }
 
+resource "azurerm_storage_account" "iothubdiag" {
+  name                     = "${var.azure_prefix}iothubdiagstorage"
+  resource_group_name      = azurerm_resource_group.iothub.name
+  location                 = azurerm_resource_group.iothub.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
 resource "azurerm_monitor_diagnostic_setting" "iothub" {
   name               = "iothub"
   target_resource_id = azurerm_iothub.iothub.id
-  storage_account_id = azurerm_storage_account.iothub.id
+  storage_account_id = azurerm_storage_account.iothubdiag.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.iothub.id
   log_analytics_destination_type = "Dedicated"
 
