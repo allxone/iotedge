@@ -11,8 +11,14 @@ resource "azurerm_storage_account" "iothub" {
   account_replication_type = "LRS"
 }
 
-resource "azurerm_storage_container" "iothub" {
-  name                  = "${var.azure_prefix}iothubcontainer"
+resource "azurerm_storage_container" "messagecontainer" {
+  name                  = "${var.azure_prefix}messagecontainer"
+  storage_account_name  = azurerm_storage_account.iothub.name
+  container_access_type = "private"
+}
+
+resource "azurerm_storage_container" "filecontainer" {
+  name                  = "${var.azure_prefix}filecontainer"
   storage_account_name  = azurerm_storage_account.iothub.name
   container_access_type = "private"
 }
@@ -56,11 +62,15 @@ resource "azurerm_iothub" "iothub" {
     name                       = "export"
     batch_frequency_in_seconds = 60
     max_chunk_size_in_bytes    = 10485760
-    container_name             = azurerm_storage_container.iothub.name
+    container_name             = azurerm_storage_container.messagecontainer.name
     encoding                   = "Avro"
     file_name_format           = "{iothub}/{partition}_{YYYY}_{MM}_{DD}_{HH}_{mm}"
   }
 
+  file_upload {
+    connection_string          = azurerm_storage_account.iothub.primary_blob_connection_string
+    container_name             = azurerm_storage_container.filecontainer.name
+  }
   # endpoint {
   #   type              = "AzureIotHub.EventHub"
   #   connection_string = azurerm_eventhub_authorization_rule.iothub.primary_connection_string
