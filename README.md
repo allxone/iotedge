@@ -20,6 +20,13 @@ Create an *edge-enabled* device identity
 ```bash
 az iot hub device-identity create --hub-name {YourIoTHubName} --device-id {YourPreferredDeviceID} --edge-enabled 
 az iot hub device-identity connection-string show --hub-name {YourIoTHubName} --device-id {YourPreferredDeviceID} | jq .connectionString
+
+# Example
+export hub=$(terraform output -json | jq -r .iothub_name.value)
+export device="mydevice"
+az iot hub device-identity create --hub-name $hub --device-id $device --edge-enabled 
+az iot hub device-identity show-connection-string --hub-name $hub --device-id $device | jq .connectionString
+
 ```
 
 
@@ -43,4 +50,12 @@ iotedge logs SimulatedTemperatureSensor
 
 # Read Avro files downloaded from the blob storage container
 java -jar avro-tools-1.9.1.jar getschema 01_2020_10_03_17_26
-java -jar avro-tools-1.9.1.jar tojson 01_2020_10_03_17_26 | jq 
+java -jar avro-tools-1.9.1.jar tojson 01_2020_10_03_17_26 | jq
+```
+
+## Develop locally
+export hub=$(terraform output -json | jq -r .iothub_name.value)
+export device="simulator"
+az iot hub device-identity create --hub-name $hub --device-id $device --edge-enabled 
+export connectionstring=$(az iot hub device-identity show-connection-string --hub-name $hub --device-id $device | jq .connectionString)
+sudo iotedgehubdev setup -c $connectionstring
