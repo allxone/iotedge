@@ -54,8 +54,11 @@ java -jar avro-tools-1.9.1.jar tojson 01_2020_10_03_17_26 | jq
 ```
 
 ## Develop locally
+
+```bash
 export hub=$(terraform output -json | jq -r .iothub_name.value)
 export device="simulator"
 az iot hub device-identity create --hub-name $hub --device-id $device --edge-enabled 
 export connectionstring=$(az iot hub device-identity show-connection-string --hub-name $hub --device-id $device | jq .connectionString)
 sudo iotedgehubdev setup -c $connectionstring
+```
